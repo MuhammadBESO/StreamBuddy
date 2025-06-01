@@ -1,6 +1,6 @@
 <template>
   <div class="bracket-container">
-    <h1 class="title">Bracket Views</h1>
+    <h1 class="title">Brackets View</h1>
 
     <div class="team-card" v-for="(team, index) in teams" :key="index">
       <!-- Team Image Upload -->
@@ -12,19 +12,14 @@
             type="file"
             accept="image/*"
             @change="onImageChange($event, team, 'image')"
-            :ref="(el) => setInputRef(index, 'image', el)"
           />
-          <button
-            v-if="team.image"
-            class="delete-button"
-            @click="deleteImage(team, 'image', index)"
-            title="Remove Image"
-          >
+          <button v-if="team.image" class="delete-button" @click="team.image = null">
             <font-awesome-icon icon="trash" />
           </button>
         </div>
         <div v-if="team.image" class="preview-wrapper">
-          <img :src="team.image" alt="Team Image" class="preview" />
+          <img :src="team.image.preview" alt="Team Image" class="preview" />
+          <span>{{ team.image.name }}</span>
         </div>
       </div>
 
@@ -37,19 +32,14 @@
             type="file"
             accept="image/*"
             @change="onImageChange($event, team, 'flag')"
-            :ref="(el) => setInputRef(index, 'flag', el)"
           />
-          <button
-            v-if="team.flag"
-            class="delete-button"
-            @click="deleteImage(team, 'flag', index)"
-            title="Remove Flag"
-          >
+          <button v-if="team.flag" class="delete-button" @click="team.flag = null">
             <font-awesome-icon icon="trash" />
           </button>
         </div>
         <div v-if="team.flag" class="preview-wrapper">
-          <img :src="team.flag" alt="Team Flag" class="preview" />
+          <img :src="team.flag.preview" alt="Team Flag" class="preview" />
+          <span>{{ team.flag.name }}</span>
         </div>
       </div>
 
@@ -65,43 +55,75 @@
         <input type="number" v-model.number="team.score" min="0" placeholder="0" />
       </div>
     </div>
+
+    <button class="export-button" @click="exportData">Export Bracket Views</button>
   </div>
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { reactive, watch } from 'vue'
 
-const teams = reactive(
+// Default teams (32)
+const defaultTeams = () =>
   Array.from({ length: 32 }, () => ({
     image: null,
     flag: null,
     name: '',
     score: 0,
-  })),
-)
+  }))
 
-const fileInputs = ref([])
+const stored = localStorage.getItem('bracket-views')
+const teams = reactive(stored ? JSON.parse(stored) : defaultTeams())
 
-function setInputRef(index, key, el) {
-  if (!fileInputs.value[index]) fileInputs.value[index] = {}
-  fileInputs.value[index][key] = el
-}
-
+// File upload handler
 function onImageChange(event, team, key) {
   const file = event.target.files[0]
-  if (file) {
-    const reader = new FileReader()
-    reader.onload = () => {
-      team[key] = reader.result
+  if (!file) return
+
+  const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '')
+
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    team[key] = {
+      name: nameWithoutExt,
+      preview: e.target.result,
     }
-    reader.readAsDataURL(file)
   }
+  reader.readAsDataURL(file)
 }
 
-function deleteImage(team, key, index) {
-  team[key] = null
-  const inputRef = fileInputs.value[index]?.[key]
-  if (inputRef) inputRef.value = ''
+// Auto-save to localStorage
+watch(
+  teams,
+  () => {
+    localStorage.setItem('bracket-views', JSON.stringify(teams))
+  },
+  { deep: true }
+)
+
+// Export JSON (only names, no previews)
+function exportData() {
+  const exportTeams = teams.map((team) => {
+    const clean = { ...team }
+    if (clean.image && clean.image.name) clean.image = clean.image.name
+    else clean.image = null
+
+    if (clean.flag && clean.flag.name) clean.flag = clean.flag.name
+    else clean.flag = null
+
+    return clean
+  })
+
+  const blob = new Blob([JSON.stringify(exportTeams, null, 2)], {
+    type: 'application/json',
+  })
+
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = 'bracket-views.json'
+  link.click()
+  URL.revokeObjectURL(url)
 }
 </script>
 
@@ -129,13 +151,6 @@ function deleteImage(team, key, index) {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
-  transition: transform 0.2s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.team-card:hover {
-  transform: scale(1.01);
-  background: #273549;
 }
 
 .field {
@@ -158,25 +173,19 @@ input[type='file'] {
   color: #e5e9f0;
   border-radius: 6px;
   font-size: 0.95rem;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-input[type='text']:focus,
-input[type='number']:focus {
-  outline: 2px solid #4f46e5;
-}
-
-.preview {
-  margin-top: 0.5rem;
-  max-height: 60px;
-  object-fit: contain;
-  border: 1px solid #444;
-  border-radius: 6px;
 }
 
 .preview-wrapper {
-  margin-top: 0.3rem;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.preview {
+  max-height: 60px;
+  border: 1px solid #444;
+  border-radius: 6px;
 }
 
 .input-preview-wrapper {
@@ -195,12 +204,22 @@ input[type='number']:focus {
   font-size: 1.2rem;
   cursor: pointer;
   color: #ef4444;
-  padding: 0;
-  line-height: 1;
 }
 
-.file-wrapper {
-  position: relative;
+.export-button {
+  margin-top: 20px;
+  background: #22c55e;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  color: #0f172a;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.export-button:hover {
+  background: #16a34a;
 }
 
 .custom-file::file-selector-button {
