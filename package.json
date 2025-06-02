@@ -1,6 +1,8 @@
 {
   "name": "electron-vue",
   "version": "1.0.0",
+  "description": "StreamBuddy – A desktop app built with Electron and Vue 3",
+  "author": "Muhammad",
   "private": true,
   "type": "module",
   "main": "src/main/main.js",
@@ -10,9 +12,9 @@
     "dev:electron": "wait-on http://localhost:5173 && electron .",
     "preview": "vite preview",
     "lint": "eslint . --fix",
-    "format": "prettier --write src/",
+    "format": "prettier --write src/",
     "build:app": "vite build",
-  "build": "npm run build:app && electron-builder"
+    "build": "npm run build:app && electron-builder"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
@@ -36,11 +38,12 @@
     "vite-plugin-vue-devtools": "^7.7.2",
     "wait-on": "^8.0.3"
   },
-  "build": {
+"build": {
   "appId": "com.example.electronvue",
   "productName": "ElectronVueApp",
   "directories": {
-    "buildResources": "build"
+    "buildResources": "build",
+    "output": "dist"
   },
   "files": [
     "dist/",
@@ -50,6 +53,7 @@
   "win": {
     "target": ["nsis", "portable"],
     "icon": "build/icon.ico"
+   
   },
   "nsis": {
     "oneClick": false,
@@ -57,7 +61,9 @@
     "allowToChangeInstallationDirectory": true,
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true
-  }
+  },
+  "forceCodeSigning": false
 }
+
 
 }
