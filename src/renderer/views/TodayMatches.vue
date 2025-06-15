@@ -3,7 +3,6 @@
   <div class="container">
     <h1 class="header">Today's Matches</h1>
 
-    <!-- Date Section -->
     <div class="panel">
       <div class="panel-title">INFO</div>
       <div class="input-row">
@@ -12,7 +11,7 @@
       </div>
     </div>
 
-    <!-- Matches Section -->
+   
     <div v-for="(match, index) in matchInfo.matches" :key="index" class="panel">
       <div class="panel-title">{{ index === 0 ? 'FIRST MATCH' : 'SECOND MATCH' }}</div>
 
@@ -32,7 +31,7 @@
             />
           </div>
 
-          <!-- Team Logo -->
+      
           <div class="input-group">
             <span>{{ side === 'left' ? 'Left' : 'Right' }} Team Logo</span>
             <div class="upload-row">
@@ -45,7 +44,7 @@
             </div>
           </div>
 
-          <!-- Team Flag -->
+    
           <div class="input-group">
             <span>{{ side === 'left' ? 'Left' : 'Right' }} Team Flag</span>
             <div class="upload-row">
@@ -61,7 +60,7 @@
       </div>
     </div>
 
-    <!-- Export Button -->
+
     <button class="export-button" @click="exportData">Export Today's Matches</button>
   </div>
 </template>
@@ -121,7 +120,7 @@ function onImageChange(event, team, key) {
 function exportData() {
   const cleanData = JSON.parse(JSON.stringify(matchInfo))
 
-  // Strip preview from export
+
   cleanData.matches.forEach((match) => {
     ['left', 'right'].forEach((side) => {
       ['logo', 'flag'].forEach((key) => {

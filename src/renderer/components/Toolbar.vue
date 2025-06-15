@@ -15,11 +15,6 @@ import { useRoute,useRouter } from 'vue-router'
 const route = useRoute()
 
 
-const router = useRouter()
-
-const goToSettings = () => {
-  router.push('/settings')
-}
 
 const viewTitle = computed(() => {
   switch (route.path) {
@@ -30,13 +25,7 @@ const viewTitle = computed(() => {
   }
 })
 
-const openSettings = () => {
-  alert('Settings clicked!')
-}
 
-const showHelp = () => {
-  alert('Help clicked!')
-}
 </script>
 
 <style scoped>

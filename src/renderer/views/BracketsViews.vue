@@ -3,7 +3,7 @@
     <h1 class="title">Brackets View</h1>
 
     <div class="team-card" v-for="(team, index) in teams" :key="index">
-      <!-- Team Image Upload -->
+
       <div class="field file-wrapper">
         <label>Team Image</label>
         <div class="input-preview-wrapper">
@@ -23,7 +23,7 @@
         </div>
       </div>
 
-      <!-- Team Flag Upload -->
+   
       <div class="field file-wrapper">
         <label>Team Flag</label>
         <div class="input-preview-wrapper">
@@ -43,13 +43,13 @@
         </div>
       </div>
 
-      <!-- Team Name -->
+  
       <div class="field">
         <label>Team Name</label>
         <input type="text" v-model="team.name" placeholder="Enter team name" />
       </div>
 
-      <!-- Team Score -->
+    
       <div class="field">
         <label>Team Score</label>
         <input type="number" v-model.number="team.score" min="0" placeholder="0" />

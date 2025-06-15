@@ -3,7 +3,7 @@
     <h1 class="title">Players Stats</h1>
 
     <div v-for="(field, index) in fields" :key="index" class="team-card">
-      <!-- Text/Number Input -->
+    
       <div class="field" v-if="field.type !== 'file'">
         <label :for="field.name">{{ field.label }}</label>
         <input
@@ -14,7 +14,7 @@
         />
       </div>
 
-      <!-- Image File Input -->
+      
       <div class="field file-wrapper" v-else>
         <label :for="field.name">{{ field.label }}</label>
         <div class="input-preview-wrapper">
