@@ -1,4 +1,3 @@
-
 <template>
   <div class="bracket-container">
     <h1 class="title">Players Stats</h1>
@@ -46,10 +45,10 @@
     <button class="export-button" @click="exportData">Export Player Status</button>
   </div>
 </template>
+
 <script setup>
 import { ref, watch } from 'vue'
 
-// Reactive form data
 const form = ref({
   playerName: '',
   teamName: '',
@@ -61,13 +60,11 @@ const form = ref({
   assists: null,
 })
 
-// File input refs
 const fileInputs = ref({})
 function setInputRef(name, el) {
   fileInputs.value[name] = el
 }
 
-// Fields config
 const fields = [
   { label: 'Player Name', name: 'playerName', type: 'text' },
   { label: 'Team Name', name: 'teamName', type: 'text' },
@@ -79,54 +76,53 @@ const fields = [
   { label: 'Assists', name: 'assists', type: 'number' },
 ]
 
-
 const stored = localStorage.getItem('Players Stats')
 if (stored) {
   const parsed = JSON.parse(stored)
-  if (parsed.heroImage && typeof parsed.heroImage === 'string') {
-    parsed.heroImage = { name: parsed.heroImage, preview: '' } 
+  if (parsed.heroImage && typeof parsed.heroImage === 'object') {
+    parsed.heroImage = {
+      name: parsed.heroImage.name,
+      preview: parsed.heroImage.preview || ''
+    }
   }
   Object.assign(form.value, parsed)
 }
-
 
 function handleFileUpload(event, fieldName) {
   const file = event.target.files[0]
   if (!file) return
 
-  const nameWithoutExt = file.name
-
   const reader = new FileReader()
   reader.onload = (e) => {
     form.value[fieldName] = {
-      name: nameWithoutExt,
+      name: file.name,
       preview: e.target.result,
     }
   }
   reader.readAsDataURL(file)
 }
 
-
 function deleteImage(fieldName) {
-  form.value[fieldName] = ""
+  form.value[fieldName] = null
   const input = fileInputs.value[fieldName]
   if (input) input.value = ''
 }
-
 
 watch(
   form,
   () => {
     const cleanData = { ...form.value }
     if (cleanData.heroImage && typeof cleanData.heroImage === 'object') {
-      cleanData.heroImage = cleanData.heroImage.name
+      cleanData.heroImage = {
+        name: cleanData.heroImage.name,
+        preview: cleanData.heroImage.preview,
+      }
     }
     localStorage.setItem('Players Stats', JSON.stringify(cleanData))
   },
   { deep: true }
 )
 
-// Export clean data
 function exportData() {
   const cleanExport = { ...form.value }
   if (cleanExport.heroImage && typeof cleanExport.heroImage === 'object') {

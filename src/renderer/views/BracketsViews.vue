@@ -58,7 +58,7 @@
 
     <div class="buttons">
       <button class="export-button" @click="exportData">Export Bracket Views</button>
-      <button class="clear-button" @click="resetTeams">Clear Inputs</button>
+ 
     </div>
   </div>
 </template>
@@ -124,11 +124,7 @@ function exportData() {
   URL.revokeObjectURL(url)
 }
 
-function resetTeams() {
-  localStorage.removeItem('Bracket-Views')
-  const reset = defaultTeams()
-  Object.assign(teams, reset)
-}
+
 </script>
 
 <style scoped>
