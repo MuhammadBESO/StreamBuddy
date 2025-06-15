@@ -1,4 +1,6 @@
 @import './base.css';
 
-#app {
+body.dark {
+  background-color: #0f172a;
+  color: #e5e7eb;
 }

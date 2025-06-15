@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 <template>
   <div class="app">
     <aside class="side-nav">
@@ -20,7 +20,7 @@
 
 <script setup>
 const views = [
- { name: 'Bracket Views', path: '/bracket' }, 
+ { name: 'Brackets View', path: '/bracket' }, 
 { name: 'Today\'s Matches', path: '/today' },
  
 ]
@@ -132,4 +132,4 @@ const views = [
   color: white;
 }
 </style>
->>>>>>> 2b85b495f9b3dd5cdbe078239c2f008b16c061c2
+

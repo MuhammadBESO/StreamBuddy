@@ -69,20 +69,20 @@
 <script setup>
 import { reactive, watch } from 'vue'
 
-const STORAGE_KEY = 'todaysMatchesData'
+const STORAGE_KEY ="Today's Matches"
 
 const defaultData = {
   date: '',
   matches: [
     {
       time: '',
-      left: { name: '', logo: null, flag: null },
-      right: { name: '', logo: null, flag: null }
+      left: { name: '', logo: "", flag: "" },
+      right: { name: '', logo: "", flag: "" }
     },
     {
       time: '',
-      left: { name: '', logo: null, flag: null },
-      right: { name: '', logo: null, flag: null }
+      left: { name: '', logo: "", flag: "" },
+      right: { name: '', logo: "", flag: "" }
     }
   ]
 }
@@ -106,7 +106,7 @@ function onImageChange(event, team, key) {
   const file = event.target.files[0]
   if (!file) return
 
-  const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, '')
+  const fileNameWithoutExt = file.name
 
   const reader = new FileReader()
   reader.onload = (e) => {
@@ -128,7 +128,7 @@ function exportData() {
         if (match[side][key] && match[side][key].name) {
           match[side][key] = match[side][key].name
         } else {
-          match[side][key] = null
+          match[side][key] = ""
         }
       })
     })
@@ -139,7 +139,7 @@ function exportData() {
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
-  link.download = 'todays-matches.json'
+  link.download = "Today's Matches.json"
   link.click()
   URL.revokeObjectURL(url)
 }

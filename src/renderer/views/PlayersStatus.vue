@@ -79,22 +79,22 @@ const fields = [
   { label: 'Assists', name: 'assists', type: 'number' },
 ]
 
-// Load from localStorage
-const stored = localStorage.getItem('player-status')
+
+const stored = localStorage.getItem('Players Stats')
 if (stored) {
   const parsed = JSON.parse(stored)
   if (parsed.heroImage && typeof parsed.heroImage === 'string') {
-    parsed.heroImage = { name: parsed.heroImage, preview: '' } // preview is reloaded on user action
+    parsed.heroImage = { name: parsed.heroImage, preview: '' } 
   }
   Object.assign(form.value, parsed)
 }
 
-// Handle file upload
+
 function handleFileUpload(event, fieldName) {
   const file = event.target.files[0]
   if (!file) return
 
-  const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '')
+  const nameWithoutExt = file.name
 
   const reader = new FileReader()
   reader.onload = (e) => {
@@ -106,14 +106,14 @@ function handleFileUpload(event, fieldName) {
   reader.readAsDataURL(file)
 }
 
-// Delete image
+
 function deleteImage(fieldName) {
-  form.value[fieldName] = null
+  form.value[fieldName] = ""
   const input = fileInputs.value[fieldName]
   if (input) input.value = ''
 }
 
-// Watch and save (only image name)
+
 watch(
   form,
   () => {
@@ -121,7 +121,7 @@ watch(
     if (cleanData.heroImage && typeof cleanData.heroImage === 'object') {
       cleanData.heroImage = cleanData.heroImage.name
     }
-    localStorage.setItem('player-status', JSON.stringify(cleanData))
+    localStorage.setItem('Players Stats', JSON.stringify(cleanData))
   },
   { deep: true }
 )
@@ -139,7 +139,7 @@ function exportData() {
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
-  link.download = 'player-status.json'
+  link.download = 'Players Stats.json'
   link.click()
   URL.revokeObjectURL(url)
 }

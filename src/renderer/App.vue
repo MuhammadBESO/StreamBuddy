@@ -2,18 +2,21 @@
   <div class="app-container">
     <aside class="side-nav">
       <h2 class="nav-title">Views</h2>
-      <RouterLink to="/bracket" class="nav-link" active-class="active-link">Bracket Views</RouterLink>
+      <RouterLink to="/bracket" class="nav-link" active-class="active-link">Brackets View</RouterLink>
       <RouterLink to="/today" class="nav-link" active-class="active-link">Today's Matches</RouterLink>
-      <RouterLink to="/players" class="nav-link" active-class="active-link">Players Status</RouterLink>
+      <RouterLink to="/players" class="nav-link" active-class="active-link">Players Stats</RouterLink>
     </aside>
     <main class="main-content">
+      <AppToolbar />
       <RouterView />
     </main>
   </div>
 </template>
 
 <script setup>
+import AppToolbar from './components/Toolbar.vue'
 </script>
+
 
 <style scoped>
 .app-container {
