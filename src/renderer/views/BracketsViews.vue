@@ -56,14 +56,16 @@
       </div>
     </div>
 
-    <button class="export-button" @click="exportData">Export Bracket Views</button>
+    <div class="buttons">
+      <button class="export-button" @click="exportData">Export Bracket Views</button>
+      <button class="clear-button" @click="resetTeams">Clear Inputs</button>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { reactive, watch } from 'vue'
 
-// Default teams (32)
 const defaultTeams = () =>
   Array.from({ length: 32 }, () => ({
     image: null,
@@ -72,15 +74,14 @@ const defaultTeams = () =>
     score: 0,
   }))
 
-const stored = localStorage.getItem('bracket-views')
+const stored = localStorage.getItem('Bracket-Views')
 const teams = reactive(stored ? JSON.parse(stored) : defaultTeams())
 
-// File upload handler
 function onImageChange(event, team, key) {
   const file = event.target.files[0]
   if (!file) return
 
-  const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '')
+  const nameWithoutExt = file.name
 
   const reader = new FileReader()
   reader.onload = (e) => {
@@ -90,28 +91,25 @@ function onImageChange(event, team, key) {
     }
   }
   reader.readAsDataURL(file)
+  event.target.value = '' 
 }
 
-// Auto-save to localStorage
 watch(
   teams,
   () => {
-    localStorage.setItem('bracket-views', JSON.stringify(teams))
+    localStorage.setItem('Bracket-Views', JSON.stringify(teams))
   },
   { deep: true }
 )
 
-// Export JSON (only names, no previews)
 function exportData() {
   const exportTeams = teams.map((team) => {
-    const clean = { ...team }
-    if (clean.image && clean.image.name) clean.image = clean.image.name
-    else clean.image = null
-
-    if (clean.flag && clean.flag.name) clean.flag = clean.flag.name
-    else clean.flag = null
-
-    return clean
+    return {
+      name: team.name,
+      score: team.score,
+      image: team.image?.name || "",
+      flag: team.flag?.name || "",
+    }
   })
 
   const blob = new Blob([JSON.stringify(exportTeams, null, 2)], {
@@ -121,19 +119,26 @@ function exportData() {
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
-  link.download = 'bracket-views.json'
+  link.download = 'Bracket-Views'
   link.click()
   URL.revokeObjectURL(url)
+}
+
+function resetTeams() {
+  localStorage.removeItem('Bracket-Views')
+  const reset = defaultTeams()
+  Object.assign(teams, reset)
 }
 </script>
 
 <style scoped>
 .bracket-container {
-  padding: 2rem;
+  padding: 1rem 1rem 2rem;
   background: #121826;
   color: #fff;
   min-height: 100vh;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-sizing: border-box;
 }
 
 .title {
@@ -147,10 +152,11 @@ function exportData() {
   background: #1f2937;
   padding: 1rem;
   border-radius: 0.75rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
+  box-sizing: border-box;
 }
 
 .field {
@@ -173,6 +179,8 @@ input[type='file'] {
   color: #e5e9f0;
   border-radius: 6px;
   font-size: 0.95rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .preview-wrapper {
@@ -180,12 +188,14 @@ input[type='file'] {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .preview {
   max-height: 60px;
   border: 1px solid #444;
   border-radius: 6px;
+  object-fit: contain;
 }
 
 .input-preview-wrapper {
@@ -206,20 +216,37 @@ input[type='file'] {
   color: #ef4444;
 }
 
-.export-button {
-  margin-top: 20px;
+.buttons {
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.export-button,
+.clear-button {
   background: #22c55e;
   border: none;
-  padding: 10px 20px;
+  padding: 0.75rem 1.5rem;
   border-radius: 8px;
   font-weight: bold;
   color: #0f172a;
   cursor: pointer;
   transition: background 0.3s;
+  font-size: 1rem;
+}
+
+.clear-button {
+  background: #f87171;
 }
 
 .export-button:hover {
   background: #16a34a;
+}
+
+.clear-button:hover {
+  background: #ef4444;
 }
 
 .custom-file::file-selector-button {
@@ -230,9 +257,27 @@ input[type='file'] {
   cursor: pointer;
 }
 
+/* Responsive Tweaks */
 @media (max-width: 768px) {
+  .title {
+    font-size: 1.5rem;
+  }
+
   .team-card {
     grid-template-columns: 1fr;
+    padding: 0.75rem;
+  }
+
+  .buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .export-button,
+  .clear-button {
+    width: 100%;
+    text-align: center;
   }
 }
+
 </style>
