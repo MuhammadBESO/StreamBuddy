@@ -1,32 +1,45 @@
-import { app, BrowserWindow } from 'electron'
-import { join, dirname } from 'path'
-import { fileURLToPath } from 'url'
+const { app, BrowserWindow } = require('electron');
+const path = require('path');
 
-// Handle __filename and __dirname in ESM
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
+let mainWindow;
 
 function createWindow() {
-  const win = new BrowserWindow({
-    width: 800,
-    height: 600,
-    icon: join(__dirname, 'public/icon.png'),
+  mainWindow = new BrowserWindow({
+    width: 1200,
+    height: 800,
+    show: false, 
+    backgroundColor: '#121826', 
     webPreferences: {
-      preload: join(__dirname, 'public/preload.js'),
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false,
     },
-  })
+  });
 
-  win.loadURL('http://localhost:5173')
+
+  const isDev = !app.isPackaged;
+  if (isDev) {
+    mainWindow.loadURL('http://localhost:5173'); 
+  } else {
+    mainWindow.loadFile(path.join(__dirname, '../dist/index.html')); 
+  }
+
+
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+  });
+
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
 }
 
-app.whenReady().then(() => {
-  createWindow()
-
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
-})
+app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit()
-})
+  if (process.platform !== 'darwin') app.quit();
+});
+
+app.on('activate', () => {
+  if (BrowserWindow.getAllWindows().length === 0) createWindow();
+});
